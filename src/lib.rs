@@ -5,7 +5,7 @@
 //! ```no_run
 //! use std::{fs, error::Error};
 //! use err_ctx::ResultExt;
-//! fn run() -> Result<(), Box<Error>> {
+//! fn run() -> Result<(), Box<dyn Error>> {
 //!     // An error here might display as "reading foo.txt: No such file or directory"
 //!     let data = fs::read("foo.txt").ctx("reading foo.txt")?;
 //!     // ...

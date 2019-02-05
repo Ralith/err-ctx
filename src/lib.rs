@@ -20,11 +20,11 @@ use std::fmt;
 #[derive(Debug)]
 pub struct Context<C> {
     context: C,
-    source: Box<dyn Error + Send + Sync + 'static>,
+    source: Box<dyn Error + Send + Sync>,
 }
 
 impl<C> Context<C> {
-    pub fn new(context: C, source: Box<dyn Error + Send + Sync + 'static>) -> Self {
+    pub fn new(context: C, source: Box<dyn Error + Send + Sync>) -> Self {
         Self { context, source }
     }
 }
@@ -45,7 +45,7 @@ impl<C: fmt::Debug + fmt::Display> Error for Context<C> {
 
 pub trait ResultExt<T, E>
 where
-    E: Error + Send + Sync + 'static,
+    E: Into<Box<dyn Error + Send + Sync>>,
 {
     /// If this `Result` is an `Err`, wrap the error with `context`.
     fn ctx<D>(self, context: D) -> Result<T, Context<D>>;
@@ -56,7 +56,7 @@ where
 
 impl<T, E> ResultExt<T, E> for Result<T, E>
 where
-    E: Error + Send + Sync + 'static,
+    E: Into<Box<dyn Error + Send + Sync>>,
 {
     fn ctx<D>(self, context: D) -> Result<T, Context<D>> {
         self.map_err(|e| e.ctx(context))
@@ -75,11 +75,11 @@ pub trait ErrorExt {
     fn ctx<D>(self, context: D) -> Context<D>;
 }
 
-impl<T: Error + Send + Sync + 'static> ErrorExt for T {
+impl<T: Into<Box<Error + Send + Sync>>> ErrorExt for T {
     fn ctx<D>(self, context: D) -> Context<D> {
         Context {
             context,
-            source: Box::new(self),
+            source: self.into(),
         }
     }
 }

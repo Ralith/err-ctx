@@ -1,16 +1,14 @@
 //! Minimalist helper library for providing contextual errors that display in the traditional
-//! "context: cause" format. Useful for applications where the primary goal is to convey detailed
-//! diagnostics to a user.
+//! "context: cause" format. Useful for cases where the primary goal of a `Result` is to convey
+//! detailed diagnostics to a user.
 //!
-//! ```no_run
-//! use std::{fs, error::Error};
+//! Pairs well with `type Result<T> = std::result::Result<T, Box<std::error::Error + Send + Sync>>;`
+//!
+//! ```
+//! use std::fs;
 //! use err_ctx::ResultExt;
-//! fn run() -> Result<(), Box<dyn Error>> {
-//!     // An error here might display as "reading foo.txt: No such file or directory"
-//!     let data = fs::read("foo.txt").ctx("reading foo.txt")?;
-//!     // ...
-//! #     Ok(())
-//! }
+//! let result = fs::read("foo.txt").ctx("reading foo.txt");
+//! assert!(result.unwrap_err().to_string().starts_with("reading foo.txt: "));
 //! ```
 
 use std::error::Error;

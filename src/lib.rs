@@ -81,3 +81,20 @@ impl<T: Into<Box<Error + Send + Sync>>> ErrorExt for T {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[allow(dead_code)]
+    fn wrap_box() -> Result<(), impl Error + Send + Sync> {
+        let x: Result<(), Box<dyn std::error::Error + Send + Sync>> = Err("foo".into());
+        x.ctx("bar")
+    }
+
+    #[allow(dead_code)]
+    fn to_box() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        std::fs::read("foo.txt").ctx("reading foo.txt")?;
+        Ok(())
+    }
+}
